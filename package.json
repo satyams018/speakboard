@@ -1,0 +1,29 @@
+{
+  "name": "speakboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Free, offline, multilingual picture communication board (AAC) for non-speaking people.",
+  "type": "module",
+  "scripts": {
+    "dev": "serve src -l 5180 --no-clipboard",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "test:e2e": "node scripts/e2e.mjs"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@fontsource/lexend": "^5.3.0",
+    "@fontsource/mukta": "^5.3.0",
+    "eslint": "^9.39.5",
+    "fake-indexeddb": "^6.2.8",
+    "globals": "^15.15.0",
+    "jsdom": "^25.0.1",
+    "prettier": "^3.10.1",
+    "puppeteer-core": "^23.11.1",
+    "serve": "^14.2.8",
+    "vitest": "^3.2.7"
+  }
+}

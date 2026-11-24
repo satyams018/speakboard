@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SpeakBoard: Voice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&family=Mukta:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Direction B: the person's sentence is the hero. It is set huge, like a voice
+         made visible, and each word lights up as it is spoken. Pictures stay quiet. */
+      :root {
+        --bg: #eef3f9;
+        --surface: #ffffff;
+        --ink: #0f1d3a;
+        --muted: #58657d;
+        --line: #d5deea;
+        --signal: #1f5bff;
+        --signal-soft: #dbe5ff;
+        --person: #e9b500;
+        --action: #2a9d55;
+        --feeling: #2f6fd6;
+        --thing: #e07020;
+        --social: #cc3f83;
+        --core: #8d97ab;
+        --focus: #ffb000;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Lexend", "Mukta", system-ui, sans-serif;
+      }
+      :lang(hi) body {
+        font-family: "Mukta", "Lexend", sans-serif;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      :focus-visible {
+        outline: 4px solid var(--focus);
+        outline-offset: 3px;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+      .shell > * {
+        min-width: 0;
+      } /* let scrolling rows scroll instead of widening the page */
+      /* ---- Left rail: categories ---- */
+      .rail {
+        padding: 22px 14px;
+        border-right: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .brand {
+        font-weight: 800;
+        font-size: 1.1rem;
+        padding: 0 10px 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand svg {
+        width: 28px;
+        height: 28px;
+        color: var(--signal);
+      }
+      #tabs {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .tab {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 11px 12px;
+        border: 0;
+        border-radius: 12px;
+        background: none;
+        text-align: left;
+        font-weight: 600;
+        color: var(--muted);
+        position: relative;
+      }
+      .tab .pic {
+        font-size: 1.3rem;
+      }
+      .tab[aria-pressed="true"] {
+        background: var(--signal-soft);
+        color: var(--ink);
+      }
+      .tab::after {
+        content: "";
+        position: absolute;
+        right: 10px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--key, var(--core));
+      }
+      .langs {
+        margin-top: 22px;
+        padding: 0 10px;
+        display: flex;
+        gap: 6px;
+      }
+      .langs button {
+        flex: 1;
+        border: 1px solid var(--line);
+        background: none;
+        padding: 7px 0;
+        border-radius: 9px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .langs button[aria-pressed="true"] {
+        border-color: var(--ink);
+        color: var(--ink);
+      }
+
+      /* ---- The voice: the memorable element ---- */
+      main {
+        padding: 26px 32px 32px;
+        min-width: 0;
+      }
+      .voice {
+        background: var(--surface);
+        border-radius: 26px;
+        padding: 26px 28px 22px;
+        border: 1px solid var(--line);
+      }
+      #sentence {
+        margin: 0;
+        min-height: 1.15em;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1.08;
+        font-size: clamp(2.4rem, 6vw, 5.2rem);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 0.28em;
+      }
+      #sentence:empty::before {
+        content: "…";
+        color: var(--line);
+      }
+      #sentence .w {
+        color: var(--ink);
+        transition:
+          color 160ms,
+          background-size 260ms;
+        padding-bottom: 0.04em;
+        background: linear-gradient(var(--signal), var(--signal)) no-repeat 0 100% / 0 0.09em;
+      }
+      body.speaking #sentence .w {
+        color: #b8c3d6;
+      }
+      body.speaking #sentence .w.now {
+        color: var(--signal);
+        background-size: 100% 0.09em;
+      }
+      .voice-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 18px;
+      }
+      #strip {
+        flex: 1;
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        min-height: 52px;
+        align-items: center;
+      }
+      #strip .empty {
+        color: var(--muted);
+      }
+      .chip {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px 6px 8px;
+        border-radius: 999px;
+        background: var(--bg);
+        font-weight: 600;
+        box-shadow: inset 0 -3px 0 var(--key, var(--core));
+      }
+      .chip .pic {
+        font-size: 1.4rem;
+      }
+      #speak {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 0;
+        border-radius: 999px;
+        background: var(--signal);
+        color: #fff;
+        font-weight: 800;
+        font-size: 1.2rem;
+        padding: 16px 28px 16px 22px;
+      }
+      #speak svg {
+        width: 26px;
+        height: 26px;
+      }
+      .ghost {
+        border: 1px solid var(--line);
+        background: none;
+        border-radius: 999px;
+        padding: 15px 18px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+
+      .suggest {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 18px 4px 14px;
+        overflow-x: auto;
+      }
+      .suggest > span {
+        color: var(--muted);
+      }
+      #suggestions {
+        display: flex;
+        gap: 8px;
+      }
+      .suggestion {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        padding: 8px 14px 8px 10px;
+        border-radius: 999px;
+        border: 1.5px solid var(--line);
+        background: var(--surface);
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      #grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+        gap: 12px;
+      }
+      .tile {
+        aspect-ratio: 1 / 1;
+        border: 0;
+        border-radius: 20px;
+        background: var(--surface);
+        display: grid;
+        place-items: center;
+        align-content: center;
+        gap: 8px;
+        position: relative;
+        box-shadow: inset 0 -6px 0 var(--key, var(--core));
+        transition: transform 90ms;
+      }
+      .tile:active {
+        transform: scale(0.96);
+      }
+      .tile .pic {
+        font-size: 3rem;
+        line-height: 1;
+      }
+      .tile .word {
+        font-weight: 600;
+        font-size: 1.08rem;
+        text-align: center;
+        padding: 0 6px;
+      }
+
+      [data-key="person"] {
+        --key: var(--person);
+      }
+      [data-key="action"] {
+        --key: var(--action);
+      }
+      [data-key="feeling"] {
+        --key: var(--feeling);
+      }
+      [data-key="thing"] {
+        --key: var(--thing);
+      }
+      [data-key="social"] {
+        --key: var(--social);
+      }
+      [data-key="core"] {
+        --key: var(--core);
+      }
+
+      @media (max-width: 760px) {
+        .shell {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .rail {
+          border-right: 0;
+          border-top: 1px solid var(--line);
+          padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+          order: 2;
+          position: sticky;
+          bottom: 0;
+          z-index: 2; /* category bar within thumb reach */
+        }
+        .brand {
+          display: none;
+        }
+        #tabs {
+          flex-direction: row;
+          overflow-x: auto;
+        }
+        .tab {
+          white-space: nowrap;
+          padding: 9px 26px 9px 12px;
+        }
+        .langs {
+          display: none;
+        }
+        main {
+          padding: 14px 12px 20px;
+        }
+        .voice {
+          padding: 18px 16px 16px;
+          border-radius: 20px;
+        }
+        .voice-row {
+          flex-wrap: wrap;
+        }
+        #strip {
+          flex-basis: 100%;
+        }
+        #speak {
+          flex: 1;
+          justify-content: center;
+        }
+        #grid {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+        }
+        .tile .pic {
+          font-size: 2.3rem;
+        }
+        .tile .word {
+          font-size: 0.95rem;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #sentence .w,
+        .tile {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="rail">
+        <div class="brand">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2" />
+          </svg>
+          SpeakBoard
+        </div>
+        <nav id="tabs" aria-label="Categories"></nav>
+        <div class="langs" aria-label="Language">
+          <button data-lang="en" aria-pressed="true">EN</button>
+          <button data-lang="hi" aria-pressed="false">हिं</button>
+          <button data-lang="es" aria-pressed="false">ES</button>
+        </div>
+      </aside>
+      <main>
+        <section class="voice" aria-label="Sentence">
+          <p id="sentence" aria-live="polite"></p>
+          <div class="voice-row">
+            <div id="strip"></div>
+            <button id="undo" class="ghost" type="button" data-ui="undo">Undo</button>
+            <button id="clear" class="ghost" type="button" data-ui="clear">Clear</button>
+            <button id="speak" type="button">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2" />
+              </svg>
+              <span data-ui="speak">Speak</span>
+            </button>
+          </div>
+        </section>
+        <div class="suggest">
+          <span data-ui="next">Next</span>
+          <div id="suggestions"></div>
+        </div>
+        <section id="grid" aria-label="Pictures"></section>
+      </main>
+    </div>
+    <script type="module">
+      import { init } from "./mock.js";
+      init();
+    </script>
+  </body>
+</html>

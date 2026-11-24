@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SpeakBoard design directions</title>
+    <style>
+      :root {
+        --bg: #f2f4f7;
+        --ink: #17202b;
+        --muted: #5a6573;
+        --card: #fff;
+        --line: #dde2e8;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px/1.5 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+      }
+      h1 {
+        font-size: 1.6rem;
+        margin: 0 0 4px;
+      }
+      main > p {
+        color: var(--muted);
+        margin: 0 0 24px;
+        max-width: 70ch;
+      }
+      .options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+      }
+      article {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .shots {
+        display: grid;
+        grid-template-columns: 1fr 34%;
+        gap: 8px;
+        padding: 12px;
+        background: #e7ebf0;
+      }
+      .shots img {
+        width: 100%;
+        border-radius: 8px;
+        display: block;
+      }
+      .text {
+        padding: 14px 18px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+      }
+      h2 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+      .text p {
+        margin: 0;
+        color: var(--muted);
+      }
+      a.open {
+        margin-top: auto;
+        align-self: flex-start;
+        background: var(--ink);
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+      }
+      a:focus-visible {
+        outline: 3px solid #ffb000;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Three directions for SpeakBoard</h1>
+      <p>
+        Each page is clickable: tap pictures, press Speak, and switch to Hindi or Spanish. They use
+        the app's real words and grammar; only the look differs.
+      </p>
+      <div class="options">
+        <article>
+          <div class="shots">
+            <img src="/design/shots/a-laminate-desktop.png" alt="Laminate on a laptop" /><img
+              src="/design/shots/a-laminate-phone.png"
+              alt="Laminate on a phone"
+            />
+          </div>
+          <div class="text">
+            <h2>A. Laminate</h2>
+            <p>
+              Looks like the laminated picture cards families and therapists already use, stuck on a
+              velcro sentence strip. Thick frames show the word type. Familiar, playful, instantly
+              "AAC".
+            </p>
+            <a class="open" href="/design/a-laminate.html">Open Laminate</a>
+          </div>
+        </article>
+        <article>
+          <div class="shots">
+            <img src="/design/shots/b-voice-desktop.png" alt="Voice on a laptop" /><img
+              src="/design/shots/b-voice-phone.png"
+              alt="Voice on a phone"
+            />
+          </div>
+          <div class="text">
+            <h2>B. Voice</h2>
+            <p>
+              The person's sentence is the hero, in huge type, and each word lights up as it is
+              spoken. Clean and modern; strongest in a demo video.
+            </p>
+            <a class="open" href="/design/b-voice.html">Open Voice</a>
+          </div>
+        </article>
+        <article>
+          <div class="shots">
+            <img src="/design/shots/c-calm-desktop.png" alt="Calm on a laptop" /><img
+              src="/design/shots/c-calm-phone.png"
+              alt="Calm on a phone"
+            />
+          </div>
+          <div class="text">
+            <h2>C. Calm</h2>
+            <p>
+              Low stimulation for autistic and sensory-sensitive users: deep indigo, soft colours, a
+              slow glow while speaking. Speak and the sentence sit at the bottom, within thumb
+              reach.
+            </p>
+            <a class="open" href="/design/c-calm.html">Open Calm</a>
+          </div>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>

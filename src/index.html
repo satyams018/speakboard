@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>SpeakBoard</title>
+    <meta
+      name="description"
+      content="A free, offline picture communication board for people who cannot speak."
+    />
+    <meta name="theme-color" content="#eef3f9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101a33" media="(prefers-color-scheme: dark)" />
+    <link
+      rel="preload"
+      href="fonts/lexend-latin-600-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="size-medium">
+    <div class="shell">
+      <aside class="rail">
+        <div class="brand">
+          <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2" />
+          </svg>
+          SpeakBoard
+        </div>
+        <nav id="tabs" class="tabs" aria-label="Categories"></nav>
+      </aside>
+
+      <main class="main">
+        <div class="main-top">
+          <span class="brand brand-small">
+            <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2" />
+            </svg>
+            SpeakBoard
+          </span>
+          <span id="stats" class="stats" aria-live="polite"></span>
+          <button id="sos" class="sos" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3 2 20h20L12 3zM12 10v4M12 17.5v.01" />
+            </svg>
+            <span data-t="help">Help</span>
+          </button>
+          <div class="tools">
+            <button id="open-test" class="tool" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7.5 14h9" />
+              </svg>
+              <span data-t="testMode">Test mode</span>
+            </button>
+            <button id="open-settings" class="tool" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
+                <circle cx="16" cy="7" r="2" />
+                <circle cx="10" cy="17" r="2" />
+              </svg>
+              <span data-t="settings">Settings</span>
+            </button>
+            <button
+              id="open-caregiver"
+              class="tool hold"
+              type="button"
+              data-t-title="holdForCaregiver"
+              title="Hold for 1 second to open caregiver tools"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+              </svg>
+              <span data-t="caregiver">Caregiver</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="banner" class="banner" role="status" hidden></div>
+        <div id="task-banner" class="task-banner" role="status" hidden></div>
+
+        <section class="voice" aria-label="Sentence">
+          <p id="sentence-text" class="sentence-text" aria-live="polite"></p>
+          <div class="voice-row">
+            <div id="strip" class="strip" aria-label="Pictures in the sentence"></div>
+            <div class="voice-actions">
+              <button id="undo" class="ghost" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9 7 4 12l5 5M4 12h11a5 5 0 0 1 0 10h-2" />
+                </svg>
+                <span data-t="undo">Undo</span>
+              </button>
+              <button id="clear" class="ghost" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                <span data-t="clear">Clear</span>
+              </button>
+              <button id="speak" class="speak" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2" />
+                </svg>
+                <span data-t="speak">Speak</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div class="suggest-row">
+          <span class="suggest-label" data-t="next">Next</span>
+          <div id="suggestions" class="suggestions"></div>
+        </div>
+
+        <section id="grid" class="grid" aria-label="Pictures"></section>
+      </main>
+    </div>
+
+    <!-- Help alarm: full screen, loud, until someone presses Stop -->
+    <dialog id="alarm-dialog" class="alarm" aria-labelledby="alarm-text">
+      <p id="alarm-text" class="alarm-text"></p>
+      <button id="alarm-stop" class="alarm-stop" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="6" y="6" width="12" height="12" rx="2" />
+        </svg>
+        <span data-t="stopAlarm">Stop</span>
+      </button>
+    </dialog>
+
+    <!-- Settings -->
+    <dialog id="settings-dialog" aria-labelledby="settings-title">
+      <form method="dialog" class="panel">
+        <h2 id="settings-title" data-t="settings">Settings</h2>
+        <label
+          ><span data-t="language">Language</span>
+          <select id="set-lang"></select>
+        </label>
+        <label
+          ><span data-t="buttonSize">Button size</span>
+          <select id="set-size">
+            <option value="small" data-t="sizeSmall">Small</option>
+            <option value="medium" data-t="sizeMedium">Medium</option>
+            <option value="large" data-t="sizeLarge">Large</option>
+          </select>
+        </label>
+        <label class="check"
+          ><input id="set-speak-on-tap" type="checkbox" />
+          <span data-t="speakOnTap">Speak each picture when tapped</span>
+        </label>
+        <label class="check"
+          ><input id="set-vibrate" type="checkbox" />
+          <span data-t="vibrate">Vibrate when a picture is tapped</span>
+        </label>
+        <label
+          ><span data-t="wordForms">Word forms</span>
+          <select id="set-gender">
+            <option value="m" data-t="male">Male (he)</option>
+            <option value="f" data-t="female">Female (she)</option>
+          </select>
+        </label>
+        <label
+          ><span data-t="voiceRate">Speech speed</span>
+          <input id="set-rate" type="range" min="0.5" max="1.5" step="0.1" />
+        </label>
+        <button class="primary" value="close" data-t="close">Close</button>
+      </form>
+    </dialog>
+
+    <!-- Caregiver tools (English only: caregivers set the device up) -->
+    <dialog id="caregiver-dialog" aria-labelledby="caregiver-title">
+      <div class="panel">
+        <h2 id="caregiver-title">Caregiver tools</h2>
+
+        <section>
+          <h3 id="add-title">Add a picture button</h3>
+          <p class="hint">
+            Use photos of the person's own family, food and places. Everything stays on this device.
+          </p>
+          <form id="add-form" class="stack">
+            <label
+              >Label (what it should say)
+              <input id="add-label" maxlength="40" required placeholder="e.g. Nani, dal, my school"
+            /></label>
+            <label
+              >Category
+              <select id="add-category"></select
+            ></label>
+            <label
+              ><span id="add-photo-label">Photo (optional)</span>
+              <input id="add-photo" type="file" accept="image/*"
+            /></label>
+            <p id="add-error" class="error" role="alert" hidden></p>
+            <div class="row">
+              <button id="add-save" class="primary" type="submit">Save button</button>
+              <button id="add-cancel" type="button" hidden>Cancel editing</button>
+            </div>
+          </form>
+        </section>
+
+        <section>
+          <h3>Record a voice</h3>
+          <p class="hint">
+            Record any button in the current language. Recordings play instead of the device voice,
+            so it can sound like a family member.
+          </p>
+          <div class="stack">
+            <label
+              >Button
+              <select id="rec-button"></select
+            ></label>
+            <div class="row">
+              <button id="rec-start" type="button" class="primary">● Record</button>
+              <button id="rec-stop" type="button" disabled>■ Stop</button>
+              <button id="rec-play" type="button" disabled>▶ Play</button>
+              <button id="rec-delete" type="button" disabled>🗑 Delete</button>
+            </div>
+            <p id="rec-status" class="hint" role="status"></p>
+          </div>
+        </section>
+
+        <section>
+          <h3>My buttons</h3>
+          <ul id="custom-list" class="custom-list"></ul>
+        </section>
+
+        <div class="row end">
+          <button id="caregiver-close" type="button" class="primary">Done</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Test mode (English only: run by the person doing the user test) -->
+    <dialog id="test-dialog" aria-labelledby="test-title">
+      <div class="panel">
+        <h2 id="test-title">Test mode</h2>
+        <div id="test-body"></div>
+      </div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" hidden></div>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

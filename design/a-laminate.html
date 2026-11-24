@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SpeakBoard: Laminate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Hind:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Direction A: the board looks like the laminated picture cards families already
+         use, stuck onto a velcro sentence strip. Frame colour = word type. */
+      :root {
+        --board: #c9d6e3;
+        --board-dot: #bccbda;
+        --card: #ffffff;
+        --ink: #1c2733;
+        --muted: #4d5b6a;
+        --strip: #22313f;
+        --hook: #2b3d4e;
+        --go: #2e9e4f;
+        --person: #f4c430;
+        --action: #2e9e4f;
+        --feeling: #2f6fd6;
+        --thing: #ee7d22;
+        --social: #d9478c;
+        --core: #8a95a3;
+        --focus: #ffb000;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Atkinson Hyperlegible", "Hind", system-ui, sans-serif;
+        color: var(--ink);
+        background-color: var(--board);
+        /* faint felt texture */
+        background-image: radial-gradient(var(--board-dot) 1px, transparent 1.2px);
+        background-size: 6px 6px;
+      }
+      :lang(hi) body,
+      :lang(hi) .word {
+        font-family: "Hind", "Atkinson Hyperlegible", sans-serif;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      :focus-visible {
+        outline: 4px solid var(--focus);
+        outline-offset: 3px;
+      }
+
+      .bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px 6px;
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+      .brand {
+        font-weight: 700;
+        font-size: 1.15rem;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .brand i {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        background: var(--card);
+        border: 4px solid var(--go);
+        display: inline-block;
+      }
+      .langs {
+        display: flex;
+        gap: 4px;
+        background: rgb(255 255 255 / 0.55);
+        padding: 4px;
+        border-radius: 10px;
+      }
+      .langs button {
+        border: 0;
+        background: none;
+        padding: 6px 12px;
+        border-radius: 7px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .langs button[aria-pressed="true"] {
+        background: var(--card);
+        color: var(--ink);
+        box-shadow: 0 1px 0 rgb(0 0 0 / 0.15);
+      }
+
+      main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 6px 20px 28px;
+      }
+
+      /* ---- The velcro strip: the one memorable element ---- */
+      .strip-wrap {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        align-items: stretch;
+        background: var(--strip);
+        background-image:
+          repeating-linear-gradient(90deg, var(--hook) 0 2px, transparent 2px 7px),
+          repeating-linear-gradient(0deg, var(--hook) 0 2px, transparent 2px 7px);
+        border-radius: 18px;
+        padding: 14px;
+        box-shadow:
+          inset 0 2px 0 rgb(255 255 255 / 0.06),
+          0 6px 0 #17222d;
+      }
+      #strip {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        overflow-x: auto;
+        min-height: 112px;
+        padding: 4px 2px 8px;
+      }
+      #strip .empty {
+        color: #c6d2dd;
+        padding-left: 8px;
+        font-size: 1.05rem;
+      }
+      .chip {
+        flex: none;
+        width: 96px;
+        height: 104px;
+        background: var(--card);
+        border-radius: 10px;
+        border: 5px solid var(--frame, var(--core));
+        display: grid;
+        place-items: center;
+        align-content: center;
+        gap: 2px;
+        box-shadow: 0 3px 0 rgb(0 0 0 / 0.35);
+        animation: stick 220ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+      }
+      .chip:nth-child(odd) {
+        transform: rotate(-1.2deg);
+      }
+      .chip:nth-child(even) {
+        transform: rotate(1deg);
+      }
+      .chip .pic {
+        font-size: 2.4rem;
+        line-height: 1;
+      }
+      .chip .word {
+        font-weight: 700;
+        font-size: 0.95rem;
+        padding: 0 4px;
+        text-align: center;
+      }
+      #strip.is-spoken .chip {
+        border-color: var(--go);
+      }
+      @keyframes stick {
+        from {
+          transform: translateY(-14px) scale(1.06);
+          opacity: 0;
+        }
+      }
+
+      .strip-actions {
+        display: grid;
+        grid-template-columns: auto auto;
+        grid-template-rows: 1fr 1fr;
+        gap: 8px;
+      }
+      #speak {
+        grid-row: 1 / 3;
+        width: 112px;
+        border: 0;
+        border-radius: 999px;
+        background: var(--go);
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.15rem;
+        display: grid;
+        place-items: center;
+        align-content: center;
+        gap: 4px;
+        box-shadow: 0 5px 0 #1f7438;
+      }
+      #speak svg {
+        width: 34px;
+        height: 34px;
+      }
+      #speak:active {
+        transform: translateY(3px);
+        box-shadow: 0 2px 0 #1f7438;
+      }
+      .small {
+        width: 92px;
+        border: 0;
+        border-radius: 12px;
+        background: #34495c;
+        color: #e8eef4;
+        font-weight: 700;
+        box-shadow: 0 3px 0 #17222d;
+      }
+      button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+
+      #sentence {
+        margin: 12px 4px 0;
+        min-height: 1.6em;
+        font-size: 1.35rem;
+        font-weight: 700;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35em;
+      }
+      #sentence .w {
+        border-bottom: 4px solid transparent;
+        transition: border-color 120ms;
+      }
+      #sentence .w.now {
+        border-color: var(--go);
+      }
+
+      .suggest {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 12px 0 18px;
+        overflow-x: auto;
+      }
+      .suggest > span {
+        color: var(--muted);
+        font-weight: 700;
+      }
+      #suggestions {
+        display: flex;
+        gap: 8px;
+      }
+      .suggestion {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px 8px 10px;
+        border-radius: 10px;
+        background: var(--card);
+        border: 3px dashed var(--frame, var(--core));
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      /* ---- Folder tabs ---- */
+      #tabs {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 0 2px;
+      }
+      .tab {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        white-space: nowrap;
+        padding: 10px 16px 12px;
+        border: 0;
+        border-radius: 12px 12px 0 0;
+        background: rgb(255 255 255 / 0.5);
+        font-weight: 700;
+        color: var(--muted);
+        border-top: 5px solid var(--frame, var(--core));
+      }
+      .tab[aria-pressed="true"] {
+        background: var(--card);
+        color: var(--ink);
+      }
+      #grid {
+        background: var(--card);
+        border-radius: 0 16px 16px 16px;
+        padding: 16px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(124px, 1fr));
+        gap: 14px;
+        box-shadow: 0 4px 0 #aebfcf;
+      }
+      .tile {
+        aspect-ratio: 1 / 1.05;
+        background: var(--card);
+        border-radius: 12px;
+        border: 6px solid var(--frame, var(--core));
+        display: grid;
+        place-items: center;
+        align-content: center;
+        gap: 6px;
+        box-shadow: 0 4px 0 color-mix(in srgb, var(--frame, var(--core)) 55%, #000);
+        transition: transform 80ms;
+      }
+      .tile:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 color-mix(in srgb, var(--frame, var(--core)) 55%, #000);
+      }
+      .tile .pic {
+        font-size: 3rem;
+        line-height: 1;
+      }
+      .tile .word {
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-align: center;
+        padding: 0 4px;
+      }
+
+      [data-key="person"] {
+        --frame: var(--person);
+      }
+      [data-key="action"] {
+        --frame: var(--action);
+      }
+      [data-key="feeling"] {
+        --frame: var(--feeling);
+      }
+      [data-key="thing"] {
+        --frame: var(--thing);
+      }
+      [data-key="social"] {
+        --frame: var(--social);
+      }
+      [data-key="core"] {
+        --frame: var(--core);
+      }
+
+      @media (max-width: 640px) {
+        .bar,
+        main {
+          padding-left: 12px;
+          padding-right: 12px;
+        }
+        .strip-wrap {
+          grid-template-columns: 1fr;
+        }
+        .strip-actions {
+          grid-template-columns: 2fr 1fr 1fr;
+          grid-template-rows: 64px;
+        }
+        #speak {
+          grid-row: auto;
+          width: auto;
+          grid-auto-flow: column;
+        }
+        #speak svg {
+          width: 26px;
+          height: 26px;
+        }
+        .small {
+          width: auto;
+        }
+        #grid {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+          padding: 10px;
+        }
+        .tile .pic {
+          font-size: 2.3rem;
+        }
+        .tile .word {
+          font-size: 0.95rem;
+        }
+        .chip {
+          width: 82px;
+          height: 92px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .chip {
+          animation: none;
+        }
+        .tile {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="bar">
+      <span class="brand"><i aria-hidden="true"></i>SpeakBoard</span>
+      <nav class="langs" aria-label="Language">
+        <button data-lang="en" aria-pressed="true">EN</button>
+        <button data-lang="hi" aria-pressed="false">हिन्दी</button>
+        <button data-lang="es" aria-pressed="false">ES</button>
+      </nav>
+    </header>
+    <main>
+      <section class="strip-wrap" aria-label="Sentence">
+        <div id="strip" aria-live="polite"></div>
+        <div class="strip-actions">
+          <button id="speak" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"
+              />
+            </svg>
+            <span data-ui="speak">Speak</span>
+          </button>
+          <button id="undo" class="small" type="button" data-ui="undo">Undo</button>
+          <button id="clear" class="small" type="button" data-ui="clear">Clear</button>
+        </div>
+      </section>
+      <p id="sentence" aria-live="polite"></p>
+      <div class="suggest">
+        <span data-ui="next">Next</span>
+        <div id="suggestions"></div>
+      </div>
+      <nav id="tabs" aria-label="Categories"></nav>
+      <section id="grid" aria-label="Pictures"></section>
+    </main>
+    <script type="module">
+      import { init } from "./mock.js";
+      init();
+    </script>
+  </body>
+</html>
