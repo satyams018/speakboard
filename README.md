@@ -65,7 +65,7 @@ versus typing the same message on the phone keyboard.
   a short message that is quick to type.
 - Every tester was at least as fast on SpeakBoard as typing (per tester: 1.0× to 1.8× faster).
 - For someone who can't speak, the drop in taps matters most: every tap is effort for people with
-  limited hand control, and SpeakBoard needs about a quarter as many.
+  limited hand control, and SpeakBoard needs less than a third as many.
 
 The testers were not AAC users, so this measures how efficient the interface is, not clinical
 benefit. The raw data is in [`docs/user-test-results.csv`](docs/user-test-results.csv).
@@ -122,7 +122,7 @@ npm run lint     # ESLint + Prettier check
 npm run test:e2e # presses every control in real Chrome (needs Google Chrome; set CHROME_PATH)
 ```
 
-GitHub Actions runs the unit tests and lint on every push and pull request. The browser check
+GitHub Actions runs the unit tests and lint before every deploy to GitHub Pages. The browser check
 follows the behaviour spec in [`docs/buttons.md`](docs/buttons.md).
 
 ## Deploy
