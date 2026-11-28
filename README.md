@@ -51,8 +51,22 @@ The caregiver tools are behind a **one-second press** so the user can't open the
 Test mode gives a repeatable number: for 5 everyday messages, median seconds and taps on SpeakBoard
 versus typing the same message on the phone keyboard.
 
-> Results from real testers go here before submission (for example: "median 3.1 s vs 11.8 s by typing,
-> 3.8× faster, N = 5 testers"). Use labels such as T1–T5, never real names.
+**5 testers (T1–T5), 5 messages each, 50 trials in English:**
+
+|                           | SpeakBoard | Typing | Difference  |
+| ------------------------- | ---------- | ------ | ----------- |
+| Median time per message   | 4.8 s      | 6.0 s  | 1.3× faster |
+| Median taps / key presses | 4          | 14     | 3.5× fewer  |
+| Messages completed        | 100%       | 100%   | same        |
+
+- SpeakBoard was faster for 4 of the 5 messages. The exception was "I am tired" (5.0 s vs 4.4 s),
+  a short message that is quick to type.
+- Every tester was at least as fast on SpeakBoard as typing (per tester: 1.0× to 1.8× faster).
+- For someone who can't speak, the drop in taps matters most: every tap is effort for people with
+  limited hand control, and SpeakBoard needs about a quarter as many.
+
+The testers were not AAC users, so this measures how efficient the interface is, not clinical
+benefit. The raw data is in [`docs/user-test-results.csv`](docs/user-test-results.csv).
 
 To run a session: open **Test mode**, enter a tester label, press Start, and follow the prompts. The
 board tasks appear above the sentence strip; the typing tasks appear in a dialog afterwards. Results
