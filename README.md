@@ -9,6 +9,8 @@ food and places, and even record the buttons in a family member's voice.
 **Try it: [satyams018.github.io/speakboard](https://satyams018.github.io/speakboard/)**. Open it once
 and it keeps working offline; on a phone, use "Add to Home screen" to install it like an app.
 
+**Watch the 2-minute demo: [youtu.be/OMDTXnP7K4M](https://youtu.be/OMDTXnP7K4M)**
+
 ![SpeakBoard on a laptop](docs/screenshot-desktop.png)
 
 <img src="docs/screenshot-mobile-hindi.png" alt="SpeakBoard in Hindi on a phone" width="300" />
